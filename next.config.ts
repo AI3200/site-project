@@ -1,13 +1,10 @@
-import type { NextConfig } from "next";
+/** @type {import('next').NextConfig} */
+const repo = 'site-project';
 
-const repo = "site-project";
-
-const nextConfig: NextConfig = {
-  output: "export",
-  distDir: "docs",
+const nextConfig = {
+  output: 'export',
   basePath: `/${repo}`,
-  assetPrefix: `/${repo}/`,
-  trailingSlash: true,
+  assetPrefix: `/${repo}`,
 };
 
-export default nextConfig;
+module.exports = nextConfig;
