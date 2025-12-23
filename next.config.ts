@@ -1,11 +1,13 @@
-/** @type {import('next').NextConfig} */
+import type { NextConfig } from "next";
 
-const repo = 'site-project';
+const repo = "site-project";
+const isGithubPagesBuild = process.env.GITHUB_ACTIONS === "true";
 
-const nextConfig = {
-  output: 'export',
-  basePath: `/${repo}`,
-  assetPrefix: `/${repo}/`,
+const nextConfig: NextConfig = {
+  output: "export",
+  basePath: isGithubPagesBuild ? `/${repo}` : "",
+  assetPrefix: isGithubPagesBuild ? `/${repo}/` : "",
+  trailingSlash: true,
 };
 
-module.exports = nextConfig;
+export default nextConfig;
