@@ -13,6 +13,8 @@ const OFFICIAL_NOTICE = `本企画では、発送業務の都合上、
 
 当該情報は共有・再利用・継続保管を行いません。`;
 
+const BASE = process.env.NODE_ENV === "production" ? "/site-project" : "";
+
 type FormState = {
   parentConsent: boolean;
   gradeBand: "" | "小1-2" | "小3-4" | "小5-6";
@@ -148,12 +150,12 @@ export default function SurveyPage() {
       </header>
 
       {/* 左右キャラ */}
-      <img className="illust taichi" src="/media/odoru_taichi.png" alt="" />
-      <img className="illust mio" src="/media/odoru_mio.png" alt="" />
+      <img className="illust taichi" src={`${BASE}/media/odoru_taichi.png`} alt="" />
+      <img className="illust mio" src={`${BASE}/media/odoru_mio.png`} alt="" />
 
       {/* ロゴ */}
       <div className="heroTitle" aria-label="おどるクイズシリーズ">
-        <img className="heroLogo" src="/media/odoru_LOGO.png" alt="おどるクイズシリーズ" />
+        <img className="heroLogo" src={`${BASE}/media/odoru_LOGO.png`} alt="おどるクイズシリーズ" />
         <h1 className="srOnly">おどるクイズシリーズ</h1>
       </div>
 
@@ -161,7 +163,7 @@ export default function SurveyPage() {
       <div className="cardWrap" aria-label="アンケート">
         <section className="card">
           {/* TN博士 */}
-          <img className="illust tn" src="/media/odoru_TN.png" alt="" />
+          <img className="illust tn" src={`${BASE}/media/odoru_TN.png`} alt="" />
 
           <h2>バッジがもらえるアンケート</h2>
           <p className="muted">1ページで完結。入力に合わせてゲージが進むよ。</p>
