@@ -3,7 +3,7 @@
 import React, { useMemo, useState } from "react";
 
 const GAS_URL =
-  "https://script.google.com/macros/s/AKfycbwpkDSnXJi63Tya7JQWctn3FxgQnIvpCHktseKTrnEnT2YzvcpMh7Ece65M_QjvGYT0pg/exec";
+  "https://script.google.com/macros/s/AKfycbyduHXEvbK0bfEjkECun71-50aO6UqhCoYqP8vgxHW8jnltKuFOChImwNTxhPipssFdrQ/exec";
 
 const OFFICIAL_NOTICE = `本企画では、発送業務の都合上、
 住所および電話番号を一時的に取得します。
@@ -110,36 +110,42 @@ export default function SurveyPage() {
     setForm((p) => ({ ...p, [key]: value }));
   };
 
-  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
+  const SECRET_TOKEN = "s00_2025-12-23__R9x4Kq7P3mZ8N2aW6JtEoBvC"; // GASと一致させる
 
-    setSubmitting(true);
-    setStatus("送信中…");
+const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+  e.preventDefault();
 
-    const payload = {
-      issue: "00",
-      submittedAt: new Date().toISOString(),
-      ...form,
-      phoneDigits: onlyDigits(form.phone),
-      postalCodeDigits: onlyDigits(form.postalCode),
-    };
+  setSubmitting(true);
+  setStatus("送信中…");
 
-    try {
-      await fetch(GAS_URL, {
-        method: "POST",
-        mode: "no-cors",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(payload),
-      });
-
-      setStatus("送信しました。ありがとうございました。バッジを準備します！");
-      setForm(initial);
-    } catch {
-      setStatus("送信に失敗しました。時間をおいて試してください。");
-    } finally {
-      setSubmitting(false);
-    }
+  const payload = {
+    token: SECRET_TOKEN, // ✅ 必須：GASの入口トークン
+    issue: "00",
+    submittedAt: new Date().toISOString(),
+    ...form,
+    phoneDigits: onlyDigits(form.phone),
+    postalCodeDigits: onlyDigits(form.postalCode),
   };
+
+  console.log("payload", payload); // ✅ ここに移動
+
+  try {
+    await fetch(GAS_URL, {
+      method: "POST",
+      mode: "no-cors", // ✅ 今回はこれで送る（レスポンスは取れない）
+      headers: { "Content-Type": "text/plain;charset=utf-8" }, // ✅ プリフライト回避
+      body: JSON.stringify(payload),
+    });
+
+    setStatus("送信しました。ありがとうございました。バッジを準備します！");
+    setForm(initial);
+  } catch (e) {
+    setStatus("送信に失敗しました。時間をおいて試してください。");
+  } finally {
+    setSubmitting(false);
+  }
+};
+
 
   return (
     <div className="stage">

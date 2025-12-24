@@ -6,7 +6,7 @@ import React, { useMemo, useState } from "react";
 const BASE = process.env.NODE_ENV === "production" ? "/site-project" : "";
 
 const GAS_URL =
-  "https://script.google.com/macros/s/AKfycbwpkDSnXJi63Tya7JQWctn3FxgQnIvpCHktseKTrnEnT2YzvcpMh7Ece65M_QjvGYT0pg/exec";
+  "https://script.google.com/macros/s/AKfycbyduHXEvbK0bfEjkECun71-50aO6UqhCoYqP8vgxHW8jnltKuFOChImwNTxhPipssFdrQ/exec";
 
 const OFFICIAL_NOTICE = `本企画では、発送業務の都合上、
 住所および電話番号を一時的に取得します。
@@ -119,45 +119,52 @@ export default function SurveyPage() {
     setForm((p) => ({ ...p, [key]: value }));
   };
 
-  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
+  
+const SECRET_TOKEN = "s00_2025-12-23__R9x4Kq7P3mZ8N2aW6JtEoBvC"; // GASと一致させる
 
-    setSubmitting(true);
-    setStatus("送信中…");
+const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+  e.preventDefault();
 
-    const payload = {
-      issue: "00",
-      submittedAt: new Date().toISOString(),
-      ...form,
-      phoneDigits: onlyDigits(form.phone),
-      postalCodeDigits: onlyDigits(form.postalCode),
-    };
+  setSubmitting(true);
+  setStatus("送信中…");
 
-    try {
-      await fetch(GAS_URL, {
-        method: "POST",
-        mode: "no-cors",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(payload),
-      });
-
-      setStatus("送信しました。ありがとうございました。バッジを準備します！");
-      setForm(initial);
-    } catch {
-      setStatus("送信に失敗しました。時間をおいて試してください。");
-    } finally {
-      setSubmitting(false);
-    }
+  const payload = {
+    token: SECRET_TOKEN, // ✅ 必須：GASの入口トークン
+    issue: "00",
+    submittedAt: new Date().toISOString(),
+    ...form,
+    phoneDigits: onlyDigits(form.phone),
+    postalCodeDigits: onlyDigits(form.postalCode),
   };
+
+  console.log("payload", payload); // ✅ ここに移動
+
+  try {
+    await fetch(GAS_URL, {
+      method: "POST",
+      mode: "no-cors", // ✅ 今回はこれで送る（レスポンスは取れない）
+      headers: { "Content-Type": "text/plain;charset=utf-8" }, // ✅ プリフライト回避
+      body: JSON.stringify(payload),
+    });
+
+    setStatus("送信しました。ありがとうございました。バッジを準備します！");
+    setForm(initial);
+  } catch (e) {
+    setStatus("送信に失敗しました。時間をおいて試してください。");
+  } finally {
+    setSubmitting(false);
+  }
+};
+
 
   return (
     <div className="wrap">
-      {/* 背景アクセント（参考画像の“ポップな面積感”） */}
+      {/* 背景（上：水色、下：薄グレー） */}
       <div className="bgTop" aria-hidden />
       <div className="bgDots" aria-hidden />
 
       <div className="stage">
-        {/* 上部：小さめブランド */}
+        {/* ブランド */}
         <header className="brand">
           <div className="brandPill">
             <span className="brandDot" aria-hidden />
@@ -165,7 +172,7 @@ export default function SurveyPage() {
           </div>
         </header>
 
-        {/* タイトル：ロゴ＋見出し（ポップ） */}
+        {/* タイトル */}
         <div className="hero">
           <img
             className="heroLogo"
@@ -175,17 +182,20 @@ export default function SurveyPage() {
           <div className="heroSub">バッジがもらえるアンケート</div>
         </div>
 
-        {/* 左右キャラ（軽く、でも存在感） */}
-        <img className="illust taichi" src={`${BASE}/media/odoru_taichi.png`} alt="" />
+        {/* 左右キャラ */}
+        <img
+          className="illust taichi"
+          src={`${BASE}/media/odoru_taichi.png`}
+          alt=""
+        />
         <img className="illust mio" src={`${BASE}/media/odoru_mio.png`} alt="" />
 
         {/* メインカード */}
         <main className="cardWrap" aria-label="アンケート">
           <section className="card">
-            {/* イントロ（参考画像の太線・枠感） */}
+            {/* イントロ */}
             <div className="intro">
               <div className="introHead">
-                <span className="chipTitle">1ページで完結</span>
                 <span className="chipTitle alt">入力に合わせてゲージUP</span>
               </div>
 
@@ -216,7 +226,9 @@ export default function SurveyPage() {
                     <input
                       type="checkbox"
                       checked={form.parentConsent}
-                      onChange={(e) => setField("parentConsent", e.target.checked)}
+                      onChange={(e) =>
+                        setField("parentConsent", e.target.checked)
+                      }
                       required
                     />
                     <span>上記内容を確認し、同意します</span>
@@ -235,7 +247,10 @@ export default function SurveyPage() {
                   <select
                     value={form.gradeBand}
                     onChange={(e) =>
-                      setField("gradeBand", e.target.value as FormState["gradeBand"])
+                      setField(
+                        "gradeBand",
+                        e.target.value as FormState["gradeBand"]
+                      )
                     }
                     required
                     className="input"
@@ -329,32 +344,36 @@ export default function SurveyPage() {
                   <div className="q">
                     <p className="qTitle">Q1. この号はどうだった？（必須）</p>
                     <div className="chips">
-                      {(["とても", "まあまあ", "ふつう", "むずかしい"] as const).map((v) => (
-                        <button
-                          key={v}
-                          type="button"
-                          onClick={() => setField("q1", v)}
-                          className={form.q1 === v ? "chip on" : "chip"}
-                        >
-                          {v}
-                        </button>
-                      ))}
+                      {(["とても", "まあまあ", "ふつう", "むずかしい"] as const).map(
+                        (v) => (
+                          <button
+                            key={v}
+                            type="button"
+                            onClick={() => setField("q1", v)}
+                            className={form.q1 === v ? "chip on" : "chip"}
+                          >
+                            {v}
+                          </button>
+                        )
+                      )}
                     </div>
                   </div>
 
                   <div className="q">
                     <p className="qTitle">Q2. またやりたい？（必須）</p>
                     <div className="chips">
-                      {(["またやりたい", "またやるかも", "わからない"] as const).map((v) => (
-                        <button
-                          key={v}
-                          type="button"
-                          onClick={() => setField("q2", v)}
-                          className={form.q2 === v ? "chip on" : "chip"}
-                        >
-                          {v}
-                        </button>
-                      ))}
+                      {(["またやりたい", "またやるかも", "わからない"] as const).map(
+                        (v) => (
+                          <button
+                            key={v}
+                            type="button"
+                            onClick={() => setField("q2", v)}
+                            className={form.q2 === v ? "chip on" : "chip"}
+                          >
+                            {v}
+                          </button>
+                        )
+                      )}
                     </div>
                   </div>
 
@@ -390,25 +409,24 @@ export default function SurveyPage() {
             </form>
           </section>
 
-          {/* ✅ TN博士：アンケートの下〜フッターの上（ここだけに配置） */}
+          {/* ✅ TN博士：カードの外、通常フローで“下に置く”ので被らない */}
           <div className="tnZone" aria-label="TN博士（装飾）">
             <img className="tn" src={`${BASE}/media/odoru_TN.png`} alt="" />
           </div>
         </main>
+
+        {/* ✅ フッターはこれだけ */}
+        <footer className="siteFooter">© 一般社団法人スマートライフ教育研究所</footer>
       </div>
 
-      {/* CSS：参考画像の「オレンジ背景・太線枠・ポップ」寄せ */}
       <style jsx global>{`
         :root{
           --ink:#1f2937;
           --ink2:#111827;
-          --paper:#fffaf0;
-          --card:#fff;
           --muted:rgba(31,41,55,.62);
 
           --orange:#ff7a00;
           --orange2:#ffb21a;
-          --cream:#fff2da;
 
           --border:3px solid rgba(17,24,39,.92);
           --shadow:0 14px 0 rgba(17,24,39,.10);
@@ -420,8 +438,8 @@ export default function SurveyPage() {
           margin:0;
           color:var(--ink2);
           background:
-            radial-gradient(1200px 500px at 50% 0%, rgba(255,255,255,.9) 0%, rgba(255,255,255,.0) 60%),
-            linear-gradient(180deg, rgba(255,122,0,.92) 0%, rgba(255,178,26,.92) 34%, #f7f7fb 34%, #f7f7fb 100%);
+            radial-gradient(1200px 520px at 50% 0%, rgba(255,255,255,.85) 0%, rgba(255,255,255,0) 62%),
+            linear-gradient(180deg, rgba(125,211,252,.95) 0%, rgba(56,189,248,.95) 34%, #f7f7fb 34%, #f7f7fb 100%);
           overflow-x:hidden;
           font-family: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Noto Sans JP", sans-serif;
         }
@@ -447,7 +465,7 @@ export default function SurveyPage() {
           position:relative;
           max-width: 980px;
           margin: 0 auto;
-          padding: 22px 16px 140px;
+          padding: 22px 16px 80px;
         }
 
         .brand{
@@ -769,30 +787,43 @@ export default function SurveyPage() {
           font-weight: 800;
         }
 
-        /* ✅ TN博士ゾーン：カードの下〜フッターの上 */
+        /* ✅ TN博士ゾーン：通常フローで右寄せ＝被らない */
         .tnZone{
           position: relative;
-          height: clamp(260px, 28vw, 420px);
-          margin-top: 10px;
+          width: 100%;
+          margin-top: 18px;
+          padding: 0 6px 18px;
+          display: flex;
+          justify-content: flex-end;
+          align-items: flex-end;
         }
         .tn{
-          position:absolute;
-          right: clamp(-6px, 0vw, 10px);
-          bottom: 0;
-          width: clamp(240px, 34vw, 460px);
-          filter: drop-shadow(0 18px 0 rgba(17,24,39,.10));
+          position: relative;
+          width: clamp(240px, 34vw, 470px);
+          height: auto;
+          display: block;
           pointer-events:none;
           user-select:none;
           -webkit-user-drag:none;
+          filter: drop-shadow(0 18px 0 rgba(17,24,39,.10));
+        }
+
+        .siteFooter{
+          text-align:center;
+          padding: 26px 12px 34px;
+          font-size: 12px;
+          font-weight: 900;
+          color: rgba(17,24,39,.45);
         }
 
         @media (max-width: 640px){
           .grid2{ grid-template-columns: 1fr; }
-          .stage{ padding-bottom: 120px; }
           .taichi{ top: 150px; left: -6px; }
           .mio{ top: 170px; right: 0px; }
           .card{ padding: 14px; }
           .stepTitle{ font-size: 15px; }
+          .tnZone{ margin-top: 14px; padding-bottom: 22px; }
+          .tn{ width: clamp(260px, 78vw, 420px); }
         }
 
         @media (max-width: 380px){
