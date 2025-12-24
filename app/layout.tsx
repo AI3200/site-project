@@ -1,12 +1,8 @@
-import type { Metadata } from "next";
+// app/layout.tsx
 import "./globals.css";
 
-export const metadata: Metadata = {
-  title: {
-    default: "site-project",
-    template: "%s | site-project",
-  },
-  description: "GitHub Pages × Next.js SSG sample site.",
+export const metadata = {
+  title: "おどるクイズシリーズ",
 };
 
 export default function RootLayout({
@@ -17,23 +13,19 @@ export default function RootLayout({
   return (
     <html lang="ja">
       <body>
-        <div className="min-h-screen bg-white text-gray-900">
-          <header className="border-b">
-            <div className="mx-auto max-w-5xl px-6 py-4">
-              <h1 className="text-xl font-semibold">site-project</h1>
-            </div>
-          </header>
+        {children}
 
-          <main className="mx-auto max-w-5xl px-6 py-12">
-            {children}
-          </main>
-
-          <footer className="border-t">
-            <div className="mx-auto max-w-5xl px-6 py-6 text-sm text-gray-500">
-              © {new Date().getFullYear()} site-project
-            </div>
-          </footer>
-        </div>
+        {/* ✅ フッターはここだけ */}
+        <footer
+          style={{
+            textAlign: "center",
+            padding: "28px 12px",
+            fontSize: "12px",
+            color: "rgba(17,24,39,.45)",
+          }}
+        >
+          © 一般社団法人スマートライフ教育研究所
+        </footer>
       </body>
     </html>
   );
