@@ -146,6 +146,30 @@ export default function SurveyPage() {
       ref: typeof window !== "undefined" ? document.referrer : "",
     };
 
+
+const handleZipChange = async (zip: string) => {
+  setField("postalCode", zip);
+
+  const digits = zip.replace(/[^\d]/g, "");
+  if (digits.length !== 7) return;
+
+  try {
+    const res = await fetch(
+      `https://zipcloud.ibsnet.co.jp/api/search?zipcode=${digits}`
+    );
+    const data = await res.json();
+
+    if (data.results && data.results[0]) {
+      const r = data.results[0];
+      const addr = `${r.address1}${r.address2}${r.address3}`;
+      setField("address1", addr);
+    }
+  } catch {
+    // 失敗しても何もしない（手入力できるのでOK）
+  }
+};
+
+
     // ✅ デバッグしたい時だけON（普段はコメントでもOK）
     console.log("payload", payload);
 
@@ -282,87 +306,92 @@ export default function SurveyPage() {
                 </div>
               </section>
 
-              {/* STEP 03 */}
-              <section className="step">
-                <div className="stepHead">
-                  <div className="stepBadge">03</div>
-                  <div className="stepTitle">バッジの送り先（必須）</div>
-                </div>
+{/* STEP 03 */}
+<section className="step">
+  <div className="stepHead">
+    <div className="stepBadge">03</div>
+    <div className="stepTitle">バッジの送り先（必須）</div>
+  </div>
 
-                <div className="panel">
-                  <label className="label">宛名（必須）</label>
-                  <input
-                    className="input"
-                    value={form.recipientName}
-                    onChange={(e) => setField("recipientName", e.target.value)}
-                    required
-                    placeholder="例：TN 博士（保護者）"
-                    autoComplete="name"
-                  />
+  <div className="panel">
+    {/* 宛名 */}
+    <label className="label">宛名（必須）</label>
+    <input
+      className="input"
+      value={form.recipientName}
+      onChange={(e) => setField("recipientName", e.target.value)}
+      required
+      placeholder="例：TN 博士（保護者）"
+      autoComplete="name"
+    />
 
-                  <div className="grid2">
-                    <div>
-                      <label className="label">郵便番号（必須）</label>
-                      <input
-                        className="input"
-                        value={form.postalCode}
-                        onChange={(e) => setField("postalCode", e.target.value)}
-                        required
-                        inputMode="numeric"
-                        placeholder="例：2200011"
-                        autoComplete="postal-code"
-                      />
-                      <p className="hint">※ハイフンなし7桁</p>
-                    </div>
+    {/* 郵便番号 */}
+    <label className="label">郵便番号（必須）</label>
+    <input
+      className="input"
+      value={form.postalCode}
+      onChange={(e) => handleZipChange(e.target.value)}
+      required
+      inputMode="numeric"
+      placeholder="例：2200011"
+      autoComplete="postal-code"
+    />
+    <p className="hint">※ハイフンなし7桁（入力すると住所が自動で入ります）</p>
 
-                    <div>
-                      <label className="label">電話番号（必須）</label>
-                      <input
-                        className="input"
-                        value={form.phone}
-                        onChange={(e) => setField("phone", e.target.value)}
-                        required
-                        inputMode="tel"
-                        placeholder="例：080-1234-5678"
-                        autoComplete="tel"
-                      />
-                      <p className="hint">※ハイフンありでもOK</p>
-                    </div>
-                  </div>
+    {/* 住所（自動入力される） */}
+    <label className="label">住所（都道府県・市区町村）（必須）</label>
+    <input
+      className="input"
+      value={form.address1}
+      onChange={(e) => setField("address1", e.target.value)}
+      required
+      placeholder="例：神奈川県横浜市西区高島"
+      autoComplete="address-level1"
+    />
 
-                      <label className="label">メールアドレス（必須）</label>
-                      <input
-                        className="input"
-                        value={form.email}
-                        onChange={(e) => setField("email", e.target.value)}
-                        inputMode="email"
-                        placeholder="例：example@gmail.com"
-                        autoComplete="email"
-                      />
-                      <p className="hint">※連絡が必要な場合のみ使用します。</p>
+    {/* 番地 */}
+    <label className="label">番地・建物名（必須）</label>
+    <input
+      className="input"
+      value={form.address2}
+      onChange={(e) => setField("address2", e.target.value)}
+      required
+      placeholder="例：1-2-5 横濱ゲートタワー19階"
+      autoComplete="street-address"
+    />
 
+    {/* 電話・メール */}
+    <div className="grid2">
+      <div>
+        <label className="label">電話番号（必須）</label>
+        <input
+          className="input"
+          value={form.phone}
+          onChange={(e) => setField("phone", e.target.value)}
+          required
+          inputMode="tel"
+          placeholder="例：080-1234-5678"
+          autoComplete="tel"
+        />
+        <p className="hint">※ハイフンありでもOK</p>
+      </div>
 
-                  <label className="label">住所（都道府県・市区町村）（必須）</label>
-                  <input
-                    className="input"
-                    value={form.address1}
-                    onChange={(e) => setField("address1", e.target.value)}
-                    required
-                    placeholder="例：神奈川県横浜市西区高島"
-                    autoComplete="address-level1"
-                  />
+      <div>
+        <label className="label">メールアドレス（必須）</label>
+        <input
+          className="input"
+          value={form.email}
+          onChange={(e) => setField("email", e.target.value)}
+          inputMode="email"
+          placeholder="例：example@gmail.com"
+          autoComplete="email"
+        />
+        <p className="hint">※連絡が必要な場合のみ使用します</p>
+      </div>
+    </div>
+  </div>
+</section>
 
-                  <label className="label">番地・建物名（必須）</label>
-                  <input
-                    className="input"
-                    value={form.address2}
-                    onChange={(e) => setField("address2", e.target.value)}
-                    required
-                    placeholder="例：1-2-5 横濱ゲートタワー19階"
-                    autoComplete="street-address"
-                  />
-                </div>
-              </section>
 
               {/* STEP 04 */}
               <section className="step">
