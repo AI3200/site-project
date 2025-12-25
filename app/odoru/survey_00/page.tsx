@@ -36,6 +36,7 @@ type FormState = {
   address1: string;
   address2: string;
   phone: string;
+  email: string;
 
   q1: "" | "とても" | "まあまあ" | "ふつう" | "むずかしい";
   q2: "" | "またやりたい" | "またやるかも" | "わからない";
@@ -53,6 +54,7 @@ const initial: FormState = {
   address1: "",
   address2: "",
   phone: "",
+  email: "",
   q1: "",
   q2: "",
   q3: "",
@@ -81,6 +83,7 @@ export default function SurveyPage() {
         "address1",
         "address2",
         "phone",
+        "email",
         "q1",
         "q2",
       ] as const,
@@ -326,6 +329,18 @@ export default function SurveyPage() {
                       <p className="hint">※ハイフンありでもOK</p>
                     </div>
                   </div>
+
+                      <label className="label">メールアドレス（任意）</label>
+                      <input
+                        className="input"
+                        value={form.email}
+                        onChange={(e) => setField("email", e.target.value)}
+                        inputMode="email"
+                        placeholder="例：example@gmail.com"
+                        autoComplete="email"
+                      />
+                      <p className="hint">※連絡が必要な場合のため。</p>
+
 
                   <label className="label">住所（都道府県・市区町村）（必須）</label>
                   <input
