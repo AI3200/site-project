@@ -814,7 +814,7 @@ export default function SurveyPage() {
 
 /* 郵便番号・電話番号を「同じサイズ感」にする（最大幅で締める） */
 .inputHalf{
-  max-width: 520px; /* ここを好みで 420〜560 くらいで微調整 */
+  max-width: 420px; /* ここを好みで 420〜560 くらいで微調整 */
 }
 
 
