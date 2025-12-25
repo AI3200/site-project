@@ -330,7 +330,7 @@ export default function SurveyPage() {
                     </div>
                   </div>
 
-                      <label className="label">メールアドレス（任意）</label>
+                      <label className="label">メールアドレス（必須）</label>
                       <input
                         className="input"
                         value={form.email}
@@ -339,7 +339,7 @@ export default function SurveyPage() {
                         placeholder="例：example@gmail.com"
                         autoComplete="email"
                       />
-                      <p className="hint">※連絡が必要な場合のため。</p>
+                      <p className="hint">※連絡が必要な場合のみ使用します。</p>
 
 
                   <label className="label">住所（都道府県・市区町村）（必須）</label>
