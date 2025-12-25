@@ -14,7 +14,7 @@ import React, { useMemo, useState } from "react";
 const BASE = process.env.NODE_ENV === "production" ? "/site-project" : "";
 
 const GAS_URL =
-  "https://script.google.com/macros/s/AKfycbwpkDSnXJi63Tya7JQWctn3FxgQnIvpCHktseKTrnEnT2YzvcpMh7Ece65M_QjvGYT0pg/exec";
+  "https://script.google.com/macros/s/AKfycbyduHXEvbK0bfEjkECun71-50aO6UqhCoYqP8vgxHW8jnltKuFOChImwNTxhPipssFdrQ/exec";
 
 // ✅ GAS 側の SECRET_TOKEN と完全一致させる
 const SECRET_TOKEN = "s00_2025-12-23__R9x4Kq7P3mZ8N2aW6JtEoBvC";
