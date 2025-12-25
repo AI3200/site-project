@@ -330,87 +330,87 @@ export default function SurveyPage() {
                 </div>
               </section>
 
-{/* STEP 03 */}
-<section className="step">
-  <div className="stepHead">
-    <div className="stepBadge">03</div>
-    <div className="stepTitle">バッジの送り先（必須）</div>
-  </div>
+              {/* STEP 03 */}
+              <section className="step">
+                <div className="stepHead">
+                  <div className="stepBadge">03</div>
+                  <div className="stepTitle">バッジの送り先（必須）</div>
+                </div>
 
-  <div className="panel">
-    {/* 宛名 */}
-    <label className="label">宛名（必須）</label>
-    <input
-      className="input"
-      value={form.recipientName}
-      onChange={(e) => setField("recipientName", e.target.value)}
-      required
-      placeholder="例：TN 博士（保護者）"
-      autoComplete="name"
-    />
+                <div className="panel">
+                  {/* 宛名 */}
+                  <label className="label">宛名（必須）</label>
+                  <input
+                    className="input"
+                    value={form.recipientName}
+                    onChange={(e) => setField("recipientName", e.target.value)}
+                    required
+                    placeholder="例：TN 博士（保護者）"
+                    autoComplete="name"
+                  />
 
-    {/* 郵便番号（小さくする） */}
-    <label className="label">郵便番号（必須）</label>
-    <input
-      className="input inputHalf"
-      value={form.postalCode}
-      onChange={(e) => handleZipChange(e.target.value)}
-      required
-      inputMode="numeric"
-      placeholder="例：2200011"
-      autoComplete="postal-code"
-    />
-    <p className="hint">※ハイフンなし7桁（入力すると住所が自動で入ります）</p>
+                  {/* 郵便番号（小さくする） */}
+                  <label className="label">郵便番号（必須）</label>
+                  <input
+                    className="input inputHalf"
+                    value={form.postalCode}
+                    onChange={(e) => handleZipChange(e.target.value)}
+                    required
+                    inputMode="numeric"
+                    placeholder="例：2200011"
+                    autoComplete="postal-code"
+                  />
+                  <p className="hint">※ハイフンなし7桁（入力すると住所が自動で入ります）</p>
 
-    {/* 住所（自動入力される） */}
-    <label className="label">住所（都道府県・市区町村）（必須）</label>
-    <input
-      className="input"
-      value={form.address1}
-      onChange={(e) => setField("address1", e.target.value)}
-      required
-      placeholder="例：神奈川県横浜市西区高島"
-      autoComplete="address-level1"
-    />
+                  {/* 住所（自動入力される） */}
+                  <label className="label">住所（都道府県・市区町村）（必須）</label>
+                  <input
+                    className="input"
+                    value={form.address1}
+                    onChange={(e) => setField("address1", e.target.value)}
+                    required
+                    placeholder="例：神奈川県横浜市西区高島"
+                    autoComplete="address-level1"
+                  />
 
-    {/* 番地 */}
-    <label className="label">番地・建物名（必須）</label>
-    <input
-      className="input"
-      value={form.address2}
-      onChange={(e) => setField("address2", e.target.value)}
-      required
-      placeholder="例：1-2-5 横濱ゲートタワー19階"
-      autoComplete="street-address"
-    />
+                  {/* 番地 */}
+                  <label className="label">番地・建物名（必須）</label>
+                  <input
+                    className="input"
+                    value={form.address2}
+                    onChange={(e) => setField("address2", e.target.value)}
+                    required
+                    placeholder="例：1-2-5 横濱ゲートタワー19階"
+                    autoComplete="street-address"
+                  />
 
-    {/* 電話（改行） */}
-    <label className="label">電話番号（必須）</label>
-    <input
-      className="input inputHalf"
-      value={form.phone}
-      onChange={(e) => setField("phone", e.target.value)}
-      required
-      inputMode="tel"
-      placeholder="例：080-1234-5678"
-      autoComplete="tel"
-    />
-    <p className="hint">※ハイフンありでもOK</p>
+                  {/* 電話（改行） */}
+                  <label className="label">電話番号（必須）</label>
+                  <input
+                    className="input inputHalf"
+                    value={form.phone}
+                    onChange={(e) => setField("phone", e.target.value)}
+                    required
+                    inputMode="tel"
+                    placeholder="例：080-1234-5678"
+                    autoComplete="tel"
+                  />
+                  <p className="hint">※ハイフンありでもOK</p>
 
-    {/* メール（改行） */}
-    <label className="label">メールアドレス（必須）</label>
-    <input
-      className="input"
-      type="email"
-      required
-      value={form.email}
-      onChange={(e) => setField("email", e.target.value)}
-      placeholder="例：example@gmail.com"
-      autoComplete="email"
-    />
-    <p className="hint">※連絡が必要な場合のみ使用します</p>
-  </div>
-</section>
+                  {/* メール（改行） */}
+                  <label className="label">メールアドレス（必須）</label>
+                  <input
+                    className="input"
+                    type="email"
+                    required
+                    value={form.email}
+                    onChange={(e) => setField("email", e.target.value)}
+                    placeholder="例：example@gmail.com"
+                    autoComplete="email"
+                  />
+                  <p className="hint">※連絡が必要な場合のみ使用します</p>
+                </div>
+              </section>
 
 
               {/* STEP 04 */}
@@ -812,10 +812,18 @@ export default function SurveyPage() {
           outline: none;
         }
 
-/* 郵便番号・電話番号を「同じサイズ感」にする（最大幅で締める） */
+/* 郵便番号・電話番号：PCは220px固定、SPは100% */
 .inputHalf{
-  max-width: 420px; /* ここを好みで 420〜560 くらいで微調整 */
+  width: 100%;        /* .input の width:100% と衝突させない */
+  max-width: 220px;   /* PCで220pxに締める */
 }
+
+@media (max-width: 640px){
+  .inputHalf{
+    max-width: 100%;  /* SPはフル幅 */
+  }
+}
+
 
 
         .input:focus {
