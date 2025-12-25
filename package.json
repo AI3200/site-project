@@ -1,7 +1,7 @@
 {
   "scripts": {
     "dev": "next dev",
-    "build": "next build && (test -d out || (echo \"ERROR: out/ not found. Check next.config.js output: 'export'\" && exit 1)) && rm -rf docs && mkdir -p docs/site-project && rsync -a --delete out/ docs/site-project/ && touch docs/.nojekyll",
+    "build": "next build && (test -d out || (echo \"ERROR: out/ not found. Check next.config.js output: 'export'\" && exit 1)) && rm -rf docs && rsync -a --delete out/ docs/ && touch docs/.nojekyll",
     "start": "next start",
     "lint": "eslint"
   }
