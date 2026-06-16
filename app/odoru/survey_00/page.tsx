@@ -29,7 +29,8 @@ const OFFICIAL_NOTICE = `本企画では、発送業務の都合上、
 
 type FormState = {
   parentConsent: boolean;
-  gradeBand: "" | "小1-2" | "小3-4" | "小5-6";
+  gradeBand: "" | "小1-2" | "小3-4" | "小5-6" | "中学生";
+  survey_source: "" | "home" | "school" | "digital_life_planner" | "unknown";
 
   recipientName: string;
   postalCode: string;
@@ -49,6 +50,7 @@ type FormState = {
 const initial: FormState = {
   parentConsent: false,
   gradeBand: "",
+  survey_source: "",
   recipientName: "",
   postalCode: "",
   address1: "",
@@ -78,6 +80,7 @@ export default function SurveyPage() {
       [
         "parentConsent",
         "gradeBand",
+        "survey_source",
         "recipientName",
         "postalCode",
         "address1",
@@ -326,6 +329,7 @@ export default function SurveyPage() {
                     <option value="小1-2">小1・小2</option>
                     <option value="小3-4">小3・小4</option>
                     <option value="小5-6">小5・小6</option>
+                    <option value="中学生">中学生</option>
                   </select>
                 </div>
               </section>
@@ -334,6 +338,63 @@ export default function SurveyPage() {
               <section className="step">
                 <div className="stepHead">
                   <div className="stepBadge">03</div>
+                  <div className="stepTitle">このアンケートを知ったきっかけを教えてください。（必須）</div>
+                </div>
+
+                <div className="panel">
+                  <div className="radioGroup">
+                    <label className="radioLabel">
+                      <input
+                        type="radio"
+                        name="survey_source"
+                        value="home"
+                        checked={form.survey_source === "home"}
+                        onChange={() => setField("survey_source", "home")}
+                        required
+                      />
+                      <span>おうちに届いた</span>
+                    </label>
+                    <label className="radioLabel">
+                      <input
+                        type="radio"
+                        name="survey_source"
+                        value="school"
+                        checked={form.survey_source === "school"}
+                        onChange={() => setField("survey_source", "school")}
+                        required
+                      />
+                      <span>学校でもらった</span>
+                    </label>
+                    <label className="radioLabel">
+                      <input
+                        type="radio"
+                        name="survey_source"
+                        value="digital_life_planner"
+                        checked={form.survey_source === "digital_life_planner"}
+                        onChange={() => setField("survey_source", "digital_life_planner")}
+                        required
+                      />
+                      <span>デジタル担当のおにいさん・おねえさんに教えてもらった</span>
+                    </label>
+                    <label className="radioLabel">
+                      <input
+                        type="radio"
+                        name="survey_source"
+                        value="unknown"
+                        checked={form.survey_source === "unknown"}
+                        onChange={() => setField("survey_source", "unknown")}
+                        required
+                      />
+                      <span>わからない</span>
+                    </label>
+                  </div>
+                </div>
+              </section>
+
+              {/* STEP 04 */}
+              <section className="step">
+                <div className="stepHead">
+                  <div className="stepBadge">04</div>
                   <div className="stepTitle">バッジの送り先（必須）</div>
                 </div>
 
@@ -413,10 +474,10 @@ export default function SurveyPage() {
               </section>
 
 
-              {/* STEP 04 */}
+              {/* STEP 05 */}
               <section className="step">
                 <div className="stepHead">
-                  <div className="stepBadge">04</div>
+                  <div className="stepBadge">05</div>
                   <div className="stepTitle">しつもん</div>
                 </div>
 
@@ -842,6 +903,33 @@ export default function SurveyPage() {
           font-size: 12px;
           color: var(--muted);
           font-weight: 800;
+        }
+
+        .radioGroup {
+          display: flex;
+          flex-direction: column;
+          gap: 12px;
+          padding: 4px 0;
+        }
+        .radioLabel {
+          display: flex;
+          gap: 10px;
+          align-items: flex-start;
+          font-weight: 900;
+          cursor: pointer;
+          font-size: 14px;
+        }
+        .radioLabel input {
+          transform: translateY(2px);
+          margin-top: 1px;
+          cursor: pointer;
+          accent-color: var(--orange);
+          width: 16px;
+          height: 16px;
+          flex-shrink: 0;
+        }
+        .radioLabel span {
+          line-height: 1.4;
         }
 
         .q {
