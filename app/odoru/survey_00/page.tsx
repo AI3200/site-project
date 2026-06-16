@@ -19,13 +19,9 @@ const GAS_URL =
 // ✅ GAS 側の SECRET_TOKEN と完全一致させる
 const SECRET_TOKEN = "s00_2025-12-23__R9x4Kq7P3mZ8N2aW6JtEoBvC";
 
-const OFFICIAL_NOTICE = `本企画では、発送業務の都合上、
-住所および電話番号を一時的に取得します。
+const OFFICIAL_NOTICE = `ご入力いただいた情報は、バッジ発送、本アンケートに関する確認、発送に関する連絡など、本企画の運営に必要な範囲で使用します。
 
-ただし、利用目的はバッジ発送のみに限定しており、
-発送完了後は速やかに削除します。
-
-当該情報は共有・再利用・継続保管を行いません。`;
+個人情報の取り扱いは、当社グループの個人情報保護方針に準じます。事前に以下をご確認ください。`;
 
 type FormState = {
   parentConsent: boolean;
@@ -39,9 +35,11 @@ type FormState = {
   phone: string;
   email: string;
 
-  q1: "" | "とても" | "まあまあ" | "ふつう" | "むずかしい";
-  q2: "" | "またやりたい" | "またやるかも" | "わからない";
+  q1: string;
+  q2: string[];
   q3: string;
+  q4: string;
+  q5: string;
 
   // ハニーポット（UIには出さない。botが埋めがち）
   company?: string;
@@ -58,8 +56,10 @@ const initial: FormState = {
   phone: "",
   email: "",
   q1: "",
-  q2: "",
+  q2: [],
   q3: "",
+  q4: "",
+  q5: "",
   company: "", // honeypot
 };
 
@@ -89,6 +89,8 @@ export default function SurveyPage() {
         "email",
         "q1",
         "q2",
+        "q3",
+        "q5",
       ] as const,
     []
   );
@@ -99,6 +101,8 @@ export default function SurveyPage() {
       const v = form[k];
       if (typeof v === "boolean") {
         if (v) c++;
+      } else if (Array.isArray(v)) {
+        if (v.length > 0) c++;
       } else {
         if (String(v).trim().length > 0) c++;
       }
@@ -108,9 +112,9 @@ export default function SurveyPage() {
 
   const progress = useMemo(() => {
     const base = (completedCount / requiredKeys.length) * 95;
-    const bonus = form.q3.trim().length >= 5 ? 5 : 0;
+    const bonus = form.q4.trim().length >= 5 ? 5 : 0;
     return clamp(Math.round(base + bonus), 0, 100);
-  }, [completedCount, requiredKeys.length, form.q3]);
+  }, [completedCount, requiredKeys.length, form.q4]);
 
   const canSubmit = useMemo(() => {
     const allRequiredFilled = completedCount === requiredKeys.length;
@@ -164,6 +168,15 @@ export default function SurveyPage() {
     }
   };
 
+  const handleQ2Toggle = (val: string) => {
+    const current = form.q2;
+    if (current.includes(val)) {
+      setField("q2", current.filter((v) => v !== val));
+    } else {
+      setField("q2", [...current, val]);
+    }
+  };
+
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
@@ -176,6 +189,7 @@ export default function SurveyPage() {
       issue: "00",
       submittedAt: new Date().toISOString(),
       ...form,
+      q2: form.q2.join(", "),
       phoneDigits: onlyDigits(form.phone),
       postalCodeDigits: onlyDigits(form.postalCode),
       ua: typeof navigator !== "undefined" ? navigator.userAgent : "",
@@ -286,11 +300,22 @@ export default function SurveyPage() {
               <section className="step">
                 <div className="stepHead">
                   <div className="stepBadge">01</div>
-                  <div className="stepTitle">保護者の方へ（必須）</div>
+                  <div className="stepTitle">個人情報の取扱いへの同意</div>
                 </div>
 
                 <div className="panel">
                   <p className="notice">{OFFICIAL_NOTICE}</p>
+
+                  <div className="policyLinkContainer">
+                    <a
+                      href="https://www.pcdepot.co.jp/p_policy.html"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="policyLink"
+                    >
+                      個人情報保護方針を確認する
+                    </a>
+                  </div>
 
                   <label className="check">
                     <input
@@ -301,7 +326,7 @@ export default function SurveyPage() {
                       }
                       required
                     />
-                    <span>上記内容を確認し、同意します</span>
+                    <span>個人情報の取り扱いについて確認し、同意します。</span>
                   </label>
                 </div>
               </section>
@@ -399,6 +424,9 @@ export default function SurveyPage() {
                 </div>
 
                 <div className="panel">
+                  <p className="notice" style={{ marginBottom: "14px" }}>
+                    学校などですでにバッジをもらった人は、もう一度もらうことはできません。
+                  </p>
                   {/* 宛名 */}
                   <label className="label">宛名（必須）</label>
                   <input
@@ -483,34 +511,19 @@ export default function SurveyPage() {
 
                 <div className="panel">
                   <div className="q">
-                    <p className="qTitle">Q1. この号はどうだった？（必須）</p>
+                    <p className="qTitle">Q1．これから、デジタルで「どうしようかな？」と思ったとき、まずしたいことはどれ？（ひとつえらんでね）</p>
                     <div className="chips">
-                      {(["とても", "まあまあ", "ふつう", "むずかしい"] as const).map(
-                        (v) => (
-                          <button
-                            key={v}
-                            type="button"
-                            onClick={() => setField("q1", v)}
-                            className={form.q1 === v ? "chip on" : "chip"}
-                          >
-                            {v}
-                          </button>
-                        )
-                      )}
-                    </div>
-                  </div>
-
-                  <div className="q">
-                    <p className="qTitle">Q2. またやりたい？（必須）</p>
-                    <div className="chips">
-                      {(
-                        ["またやりたい", "またやるかも", "わからない"] as const
-                      ).map((v) => (
+                      {[
+                        "いちど立ちどまって考える",
+                        "家族や先生に見せる",
+                        "あんしんな使い方をえらぶ",
+                        "だれかにそうだんする"
+                      ].map((v) => (
                         <button
                           key={v}
                           type="button"
-                          onClick={() => setField("q2", v)}
-                          className={form.q2 === v ? "chip on" : "chip"}
+                          onClick={() => setField("q1", v)}
+                          className={form.q1 === v ? "chip on" : "chip"}
                         >
                           {v}
                         </button>
@@ -518,16 +531,79 @@ export default function SurveyPage() {
                     </div>
                   </div>
 
-                  <div className="q">
+                  <div className="q" style={{ marginTop: "18px" }}>
+                    <p className="qTitle">Q2．デジタルヒーローズになったら、だれの力になりたい？（いくつえらんでもOK）</p>
+                    <div className="chips">
+                      {[
+                        "お父さん・お母さん",
+                        "おじいちゃん・おばあちゃん",
+                        "きょうだい",
+                        "おともだち",
+                        "じぶん"
+                      ].map((v) => (
+                        <button
+                          key={v}
+                          type="button"
+                          onClick={() => handleQ2Toggle(v)}
+                          className={form.q2.includes(v) ? "chip on" : "chip"}
+                        >
+                          {v}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+
+                  <div className="q" style={{ marginTop: "18px" }}>
+                    <p className="qTitle">Q3．もっとスマートライフについて知りたいですか？（ひとつえらんでね）</p>
+                    <div className="chips">
+                      {[
+                        "とても知りたい",
+                        "少しきょうみがある",
+                        "むずかしいかも",
+                        "とてもむずかしい"
+                      ].map((v) => (
+                        <button
+                          key={v}
+                          type="button"
+                          onClick={() => setField("q3", v)}
+                          className={form.q3 === v ? "chip on" : "chip"}
+                        >
+                          {v}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+
+                  <div className="q" style={{ marginTop: "18px" }}>
                     <label className="qTitle">
-                      Q3. つぎに入れてほしいこと（任意）
+                      Q4．ドリルを見ながら、かぞくとどんな話をしましたか？（じゆうにかいてね）
                     </label>
+                    <p className="hint" style={{ marginTop: "4px", marginBottom: "8px" }}>
+                      書いてくれた内容は、えらばれたものをホームページなどで紹介することがあります。名前・住所・電話番号・学校名など、個人がわかる情報は掲載しません。
+                    </p>
                     <textarea
                       className="input"
-                      value={form.q3}
-                      onChange={(e) => setField("q3", e.target.value)}
+                      value={form.q4}
+                      onChange={(e) => setField("q4", e.target.value)}
                       rows={4}
-                      placeholder="例：もっとクイズをふやして！など"
+                      placeholder="じゆうにかいてね"
+                    />
+                  </div>
+
+                  <div className="q" style={{ marginTop: "18px" }}>
+                    <label className="qTitle">
+                      Q5．これから、おうちや学校でやってみたいことをかいてね！（必須・じゆうにかいてね）
+                    </label>
+                    <p className="hint" style={{ marginTop: "4px", marginBottom: "8px" }}>
+                      書いてくれた内容は、えらばれたものをホームページなどで紹介することがあります。名前・住所・電話番号・学校名など、個人がわかる情報は掲載しません。
+                    </p>
+                    <textarea
+                      className="input"
+                      value={form.q5}
+                      onChange={(e) => setField("q5", e.target.value)}
+                      required
+                      rows={4}
+                      placeholder="必須・じゆうにかいてね"
                     />
                   </div>
                 </div>
@@ -544,11 +620,6 @@ export default function SurveyPage() {
                 </button>
 
                 {status && <p className="status">{status}</p>}
-
-                <p className="tiny">
-                  ※現在の送信方式（no-cors）は「送信成功」を厳密に判定できません。住所・電話必須運用なら、
-                  次のステップで CORS対応 または Next.js API 経由に切替推奨です。
-                </p>
               </div>
             </form>
           </section>
@@ -843,6 +914,20 @@ export default function SurveyPage() {
           border-radius: 14px;
           padding: 12px;
           font-weight: 800;
+        }
+
+        .policyLinkContainer {
+          margin-top: 14px;
+          margin-bottom: 14px;
+          padding-left: 4px;
+        }
+        .policyLink {
+          color: var(--orange);
+          font-weight: 800;
+          text-decoration: underline;
+        }
+        .policyLink:hover {
+          color: var(--orange2);
         }
 
         .check {
